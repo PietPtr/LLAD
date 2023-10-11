@@ -122,7 +122,7 @@ impl SampleLogger {
     /// * `Result<(), &'static str>`: Returns `Ok(())` if the sample is logged successfully or if logging is disabled.
     ///   Returns `Err` with a static string describing the error otherwise.
     pub fn write(&mut self, key: &str, value: f32) -> Result<(), &'static str> {
-        if cfg!(feature = "enabled") {
+        if !cfg!(feature = "disabled") {
             if !self.is_logging_active() {
                 return Ok(()); // Don't write anything if we've seen enough samples.
             }
@@ -205,7 +205,7 @@ impl SampleLogger {
     /// * `Result<(), Box<dyn Error>>`: Returns `Ok(())` if the data is written successfully or if logging is disabled.
     ///    Propagates any IO errors otherswise.
     pub fn write_debug_values(&mut self) -> Result<(), Box<dyn Error>> {
-        if cfg!(feature = "enabled") {
+        if !cfg!(feature = "disabled") {
             self.is_logged_correctly()?;
 
             let max_len = self
