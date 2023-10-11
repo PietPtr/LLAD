@@ -1,12 +1,11 @@
-//! Provides [`SampleLogger`], which can be inserted into a plugin to keep track of internal values 
+//! Provides [`SampleLogger`], which can be inserted into a plugin to keep track of internal values
 //! every sample time. The CSV can then be plotted in a spreadshot program or with e.g. matplotlib.
 //! This crate has an `disable` feature which when turned on disables all the code that might slow
-//! down the plugin. This way it's possible to insert the logging in a plugin but build it in a 
+//! down the plugin. This way it's possible to insert the logging in a plugin but build it in a
 //! production mode as well where the logging doesn't cause performance issues.
 
 extern crate csv;
 use std::{collections::HashMap, error::Error, fs::File};
-
 
 /// Reads a CSV file and converts it into a hashmap where each key corresponds to a column header
 /// and each value is a vector of floats representing the audio data. This function exists to
@@ -67,14 +66,14 @@ pub fn read_csv_as_audio_data(
 ///
 /// It is mandatory to have at least one field named 'sample', since that's what's counted to determine that the logging should
 /// stop.
-/// 
+///
 /// A minimal structure to use this library in a VST3 plugin (e.g. using [nih-plug](https://github.com/robbert-vdh/nih-plug))
 /// requires:
-/// 
+///
 /// * A [`SampleLogger`] (likely on the struct that implements `Plugin`).
 /// * For every sample that the plugin handles, calls to [`SampleLogger::write`], at least one of which must be named 'sample'.
 /// * on deactivation of the plugin, or termination of the program, a call to [`SampleLogger::write_debug_values`].
-/// 
+///
 /// A project using this crate can be found [here](https://github.com/PietPtr/compressor).
 ///
 /// # Fields
@@ -153,12 +152,12 @@ impl SampleLogger {
         self.quit_after_n_samples = Some(samples as u64);
     }
 
-    /// Determines whether the logging is still active based on the number of samples seen and 
+    /// Determines whether the logging is still active based on the number of samples seen and
     /// the optional `quit_after_n_samples` field. Returns true if quit_after_n_samples is None.
     ///
     /// # Returns
     ///
-    /// * `bool`: Returns `true` if logging is still active (i.e., the number of samples seen is 
+    /// * `bool`: Returns `true` if logging is still active (i.e., the number of samples seen is
     ///   less than the optional `quit_after_n_samples` field or if `quit_after_n_samples` is `None`).
     ///   Returns `false` otherwise.
     pub fn is_logging_active(&self) -> bool {
@@ -184,8 +183,14 @@ impl SampleLogger {
             .map(|vec| vec.len())
             .collect();
 
+            
         // Checks whether all lists have n or n+1 elements.
-        let n = lengths.iter().sum::<usize>() / lengths.len();
+        let n = if lengths.len() > 0 {
+            lengths.iter().sum::<usize>() / lengths.len()
+        } else {
+            0
+        };
+
         if !lengths.iter().all(|&elem| elem == n || elem == n + 1) {
             return Err("Element added to list caused imbalance.");
         }
