@@ -50,7 +50,7 @@ pub fn read_csv_as_audio_data(
         for (i, header) in headers.iter().enumerate() {
             data.entry(String::from(header))
                 .or_insert(Vec::new())
-                .push(row[i] as f32);
+                .push(row[i]);
         }
     }
 
@@ -149,7 +149,7 @@ impl SampleLogger {
     ///
     /// * `samples`: A float representing the number of samples after which logging should stop.
     pub fn set_quit_after_n_samples(&mut self, samples: u64) {
-        self.quit_after_n_samples = Some(samples as u64);
+        self.quit_after_n_samples = Some(samples);
     }
 
     /// Determines whether the logging is still active based on the number of samples seen and
@@ -179,13 +179,12 @@ impl SampleLogger {
         let lengths: Vec<usize> = self
             .debug_values
             .values()
-            .into_iter()
             .map(|vec| vec.len())
             .collect();
 
             
         // Checks whether all lists have n or n+1 elements.
-        let n = if lengths.len() > 0 {
+        let n = if !lengths.is_empty() {
             lengths.iter().sum::<usize>() / lengths.len()
         } else {
             0
